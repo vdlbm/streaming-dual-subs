@@ -1,0 +1,14 @@
+# Node
+extension/node_modules/
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Environment variables
+.env
+.env.*
