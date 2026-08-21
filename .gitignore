@@ -1,14 +1,15 @@
-# Node
-extension/node_modules/
-
 # macOS
 .DS_Store
 
+# Node
+extension/node_modules/
+extension/dist/
+
 # Python
+translator/.venv/
 __pycache__/
 *.py[cod]
-.venv/
 
-# Environment variables
+# Entornos
 .env
 .env.*
