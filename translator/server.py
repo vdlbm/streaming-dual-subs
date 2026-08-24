@@ -41,3 +41,7 @@ def translate(request: TranslationRequest):
     )
 
     return TranslationResponse(translation=result)
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
