@@ -1,33 +1,65 @@
 let lastSubtitle = "";
+let hideTimeout = null;
 
-export function startSubtitleObserver(onSubtitleChange) {
-    function observeSubtitles(subtitleElement) {
-        const observer = new MutationObserver(() => {
-            const current = subtitleElement.innerText.trim();
-
-            if (current && current !== lastSubtitle) {
-                lastSubtitle = current;
-                onSubtitleChange(current);
-            }
-        });
-
-        observer.observe(subtitleElement, {
-            childList: true,
-            subtree: true,
-            characterData: true
-        });
-
-        console.log("Subtitle observer started.");
+export function startSubtitleObserver(onSubtitleChange, onSubtitleClear) {
+    function getSubtitleContainer() {
+        return document.querySelector(
+            ".player-timedtext-text-container"
+        );
     }
 
-    const interval = setInterval(() => {
-        const subtitle = document.querySelector(".player-timedtext");
+    function processCurrentSubtitle() {
+        const container = getSubtitleContainer();
 
-        if (subtitle) {
-            clearInterval(interval);
-
-            console.log("Subtitle container found!");
-            observeSubtitles(subtitle);
+        if (!container) {
+            scheduleClear();
+            return;
         }
-    }, 500);
+
+        const current = container.innerText.trim();
+
+        if (!current) {
+            scheduleClear();
+            return;
+        }
+
+        // Ha aparecido un subtítulo.
+        clearTimeout(hideTimeout);
+
+        if (current !== lastSubtitle) {
+            lastSubtitle = current;
+
+            console.log("New German subtitle:", current);
+
+            onSubtitleChange(current);
+        }
+    }
+
+    function scheduleClear() {
+        clearTimeout(hideTimeout);
+
+        hideTimeout = setTimeout(() => {
+            if (!getSubtitleContainer()) {
+                lastSubtitle = "";
+
+                console.log("German subtitle disappeared.");
+
+                onSubtitleClear();
+            }
+        }, 100);
+    }
+
+    const observer = new MutationObserver(() => {
+        processCurrentSubtitle();
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        characterData: true
+    });
+
+    console.log("Global subtitle observer started.");
+
+    processCurrentSubtitle();
 }

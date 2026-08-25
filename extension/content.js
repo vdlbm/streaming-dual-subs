@@ -1,21 +1,42 @@
 import { startSubtitleObserver } from "./subtitles.js";
 import { translateText } from "./translator.js";
-import { createOverlay, updateOverlay } from "./overlay.js";
+import {
+    updateOverlay,
+    clearOverlay
+} from "./overlay.js";
 
-console.log("Streaming Dual Subtitles v0.1.0 loaded!");
+console.log("Streaming Dual Subtitles loaded");
 
-createOverlay();
+let translationRequestId = 0;
 
-startSubtitleObserver(async (subtitle) => {
-    console.log("German:", subtitle);
+startSubtitleObserver(
+    async (subtitle) => {
+        const requestId = ++translationRequestId;
 
-    try {
-        const translation = await translateText(subtitle);
+        console.log("Received subtitle:", subtitle);
 
-        console.log("Spanish:", translation);
+        try {
+            console.log("Calling translator...");
 
-        updateOverlay(translation);
-    } catch (error) {
-        console.error("Translation error:", error);
+            const translation = await translateText(subtitle);
+
+            // Si mientras traducíamos llegó otra frase,
+            // ignoramos esta traducción porque ya está obsoleta.
+            if (requestId !== translationRequestId) {
+                console.log("Ignoring outdated translation.");
+                return;
+            }
+
+            console.log("Translation received:", translation);
+
+            updateOverlay(translation);
+        } catch (error) {
+            console.error("Translation error:", error);
+        }
+    },
+    () => {
+        translationRequestId++;
+
+        clearOverlay();
     }
-});
+);
