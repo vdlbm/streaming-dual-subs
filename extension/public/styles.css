@@ -1,1 +1,25 @@
-p
+#nds-spanish-subtitle {
+    position: fixed;
+
+    left: 50%;
+    bottom: 6%;
+
+    transform: translateX(-50%);
+
+    max-width: 80%;
+
+    text-align: center;
+
+    color: #e6e6e6;
+
+    font-size: 24px;
+    font-family: "Netflix Sans", Helvetica, Arial, sans-serif;
+
+    text-shadow:
+        0 0 7px black,
+        2px 2px 4px black;
+
+    z-index: 999999;
+
+    pointer-events: none;
+}
